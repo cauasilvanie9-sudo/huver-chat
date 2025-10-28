@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=450, height=350">
+    <title>Chat Huver - DEFINITIVO</title>
+    <style>
+        @font-face {
+            font-family: 'YouBlockhead';
+            src: local('YouBlockhead'), local('You Blockhead');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 450px;
+            height: 350px;
+            overflow: hidden;
+            background: transparent;
+            font-family: 'YouBlockhead', 'Impact', 'Arial Black', sans-serif;
+        }
+
+        #chat-container {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .chat-message {
+            background: linear-gradient(135deg, 
+                rgba(26, 77, 143, 0.95) 0%, 
+                rgba(37, 99, 168, 0.92) 100%);
+            border: 3px solid rgba(255, 215, 0, 0.8);
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.4),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .chat-username {
+            font-family: 'YouBlockhead', 'Impact', 'Arial Black', sans-serif;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 
+                2px 2px 0px #000000,
+                -1px -1px 0px #000000,
+                1px -1px 0px #000000,
+                -1px 1px 0px #000000,
+                0px 0px 10px rgba(255, 215, 0, 0.8);
+            margin-right: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            margin-right: 4px;
+        }
+
+        .badge-broadcaster {
+            background: linear-gradient(135deg, #E50914 0%, #B20710 100%);
+            color: #FFFFFF;
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 10px rgba(229, 9, 20, 0.6);
+        }
+
+        .badge-mod {
+            background: linear-gradient(135deg, #00AD03 0%, #008702 100%);
+            color: #FFFFFF;
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+        }
+
+        .badge-vip {
+            background: linear-gradient(135deg, #E005E0 0%, #9D039D 100%);
+            color: #FFFFFF;
+            border: 2px solid #FF00FF;
+            box-shadow: 0 0 10px rgba(224, 5, 224, 0.4);
+        }
+
+        .badge-sub {
+            background: linear-gradient(135deg, #9147FF 0%, #7127CC 100%);
+            color: #FFFFFF;
+            border: 2px solid #B380FF;
+            box-shadow: 0 0 10px rgba(145, 71, 255, 0.4);
+        }
+
+        .badge-prime {
+            background: linear-gradient(135deg, #00A8FC 0%, #0081CC 100%);
+            color: #FFFFFF;
+            border: 2px solid #4DC3FF;
+            box-shadow: 0 0 10px rgba(0, 168, 252, 0.4);
+        }
+
+        .chat-text {
+            font-family: 'YouBlockhead', 'Impact', 'Arial Black', sans-serif;
+            font-size: 17px;
+            color: #FFFFFF;
+            font-weight: normal;
+            text-shadow: 
+                2px 2px 0px #000000,
+                -1px -1px 0px #000000,
+                1px -1px 0px #000000,
+                -1px 1px 0px #000000;
+            line-height: 1.4;
+            display: inline;
+        }
+
+        .chat-message.broadcaster {
+            border-color: rgba(229, 9, 20, 0.9);
+            box-shadow: 
+                0 0 25px rgba(229, 9, 20, 0.6),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, 
+                rgba(26, 77, 143, 0.95) 0%, 
+                rgba(139, 0, 0, 0.3) 100%);
+        }
+
+        .chat-message.moderator {
+            border-color: rgba(0, 255, 0, 0.8);
+            box-shadow: 
+                0 0 25px rgba(0, 255, 0, 0.5),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, 
+                rgba(26, 77, 143, 0.95) 0%, 
+                rgba(0, 139, 0, 0.3) 100%);
+        }
+
+        .chat-message.vip {
+            border-color: rgba(224, 5, 224, 0.8);
+            box-shadow: 
+                0 0 25px rgba(224, 5, 224, 0.5),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-message.subscriber {
+            border-color: rgba(147, 112, 219, 0.9);
+            box-shadow: 
+                0 0 20px rgba(147, 112, 219, 0.5),
+                inset 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .status {
+            display: none !important; /* REMOVIDO */
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container"></div>
+
+    <script>
+        // ================================================
+        // CHAT DIRETO VIA WEBSOCKET - SEM BIBLIOTECAS!
+        // ================================================
+        
+        const CANAL = 'huverpereira22'; // MUDE AQUI para seu canal
+        const chatContainer = document.getElementById('chat-container');
+        const MAX_MESSAGES = 15;
+        
+        let ws = null;
+        let reconnectAttempts = 0;
+        const MAX_RECONNECT = 5;
+
+        function addSystemMessage(message, color = '#FFD700') {
+            // Mensagens do sistema DESATIVADAS
+            console.log('Sistema:', message);
+        }
+
+        function addMessage(username, message, userType, badges, color) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            // Aplicar classe específica baseada no tipo de usuário
+            if (userType === 'broadcaster') messageDiv.classList.add('broadcaster');
+            else if (userType === 'moderator') messageDiv.classList.add('moderator');
+            else if (userType === 'vip') messageDiv.classList.add('vip');
+            else if (userType === 'subscriber') messageDiv.classList.add('subscriber');
+
+            // Criar badges HTML
+            let badgesHTML = '';
+            if (badges) {
+                if (badges.broadcaster) {
+                    badgesHTML += '<span class="badge badge-broadcaster">👑 DONO</span>';
+                }
+                if (badges.moderator) {
+                    badgesHTML += '<span class="badge badge-mod">🛡️ MOD</span>';
+                }
+                if (badges.vip) {
+                    badgesHTML += '<span class="badge badge-vip">💎 VIP</span>';
+                }
+                if (badges.subscriber || badges.founder) {
+                    badgesHTML += '<span class="badge badge-sub">⭐ SUB</span>';
+                }
+                if (badges.premium) {
+                    badgesHTML += '<span class="badge badge-prime">♛ PRIME</span>';
+                }
+            }
+
+            // Definir cor baseada no tipo se não tiver cor personalizada
+            let usernameColor = color || '#FFFFFF';
+            if (userType === 'broadcaster') usernameColor = '#E50914';
+            else if (userType === 'moderator') usernameColor = '#00FF00';
+            else if (userType === 'vip') usernameColor = '#E005E0';
+            else if (userType === 'subscriber') usernameColor = '#9147FF';
+
+            messageDiv.innerHTML = `
+                <span class="chat-username">
+                    ${badgesHTML}
+                    <span style="color: ${usernameColor};">${username}:</span>
+                </span>
+                <span class="chat-text">${escapeHtml(message)}</span>
+            `;
+
+            chatContainer.appendChild(messageDiv);
+            cleanOldMessages();
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function cleanOldMessages() {
+            const messages = chatContainer.getElementsByClassName('chat-message');
+            while (messages.length > MAX_MESSAGES) {
+                chatContainer.removeChild(messages[0]);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function connectChat() {
+
+            // Conectar ao IRC da Twitch via WebSocket
+            ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+
+            ws.onopen = () => {
+                console.log('✅ WebSocket conectado!');
+                
+                // Enviar comandos IRC
+                ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+                ws.send('PASS SCHMOOPIIE'); // Senha falsa para conexão anônima
+                ws.send('NICK justinfan12345'); // Usuario anônimo
+                ws.send(`JOIN #${CANAL.toLowerCase()}`);
+                
+                reconnectAttempts = 0;
+                // Status removido
+            };
+
+            ws.onmessage = (event) => {
+                const messages = event.data.split('\r\n');
+                
+                messages.forEach(msg => {
+                    if (!msg) return;
+                    
+                    console.log('📩', msg);
+
+                    // Responder PING para manter conexão
+                    if (msg.startsWith('PING')) {
+                        ws.send('PONG :tmi.twitch.tv');
+                        return;
+                    }
+
+                    // Processar mensagens do chat
+                    if (msg.includes('PRIVMSG')) {
+                        const parsed = parseIRCMessage(msg);
+                        if (parsed) {
+                            addMessage(
+                                parsed.username,
+                                parsed.message,
+                                parsed.userType,
+                                parsed.badges,
+                                parsed.color
+                            );
+                        }
+                    }
+                });
+            };
+
+            ws.onerror = (error) => {
+                console.error('❌ Erro WebSocket:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('🔴 WebSocket fechado');
+
+                // Tentar reconectar
+                if (reconnectAttempts < MAX_RECONNECT) {
+                    reconnectAttempts++;
+                    setTimeout(connectChat, 3000);
+                }
+            };
+        }
+
+        function parseIRCMessage(msg) {
+            try {
+                // Extrair tags
+                const tagsMatch = msg.match(/^@([^ ]+)/);
+                const tags = {};
+                const badgesObj = {};
+                if (tagsMatch) {
+                    tagsMatch[1].split(';').forEach(tag => {
+                        const [key, value] = tag.split('=');
+                        tags[key] = value;
+                    });
+                }
+
+                // Extrair username
+                const userMatch = msg.match(/:([^!]+)!/);
+                const username = tags['display-name'] || (userMatch ? userMatch[1] : 'Anônimo');
+
+                // Extrair mensagem
+                const msgMatch = msg.match(/PRIVMSG #[^ ]+ :(.+)$/);
+                const message = msgMatch ? msgMatch[1] : '';
+
+                // Processar badges
+                const badgesString = tags['badges'] || '';
+                const badgePairs = badgesString.split(',');
+                
+                badgePairs.forEach(pair => {
+                    if (pair) {
+                        const [badgeName] = pair.split('/');
+                        badgesObj[badgeName] = true;
+                    }
+                });
+
+                // Determinar tipo de usuário (prioridade: broadcaster > mod > vip > sub)
+                let userType = 'viewer';
+                if (badgesObj.broadcaster) {
+                    userType = 'broadcaster';
+                } else if (badgesObj.moderator) {
+                    userType = 'moderator';
+                } else if (badgesObj.vip) {
+                    userType = 'vip';
+                } else if (badgesObj.subscriber || badgesObj.founder) {
+                    userType = 'subscriber';
+                }
+
+                // Cor do usuário (customizada da Twitch ou cor padrão do tipo)
+                const color = tags['color'] || null;
+
+                return { 
+                    username, 
+                    message, 
+                    userType, 
+                    badges: badgesObj, 
+                    color 
+                };
+            } catch (e) {
+                console.error('Erro ao parsear mensagem:', e);
+                return null;
+            }
+        }
+
+        // Iniciar conexão
+        connectChat();
+
+        console.log('🎮 Chat customizado Huver - Conectando via WebSocket direto!');
+    </script>
+</body>
+</html>
